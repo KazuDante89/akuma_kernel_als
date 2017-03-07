@@ -1972,9 +1972,12 @@ ifeq ($(call cc-option-yn, -Wheader-guard),y)
 EXTRA_CFLAGS += -Wheader-guard
 endif
 
-# To build without debug just ignore not used code.
-EXTRA_CFLAGS += $(call cc-disable-warning,unused-variable,)
-EXTRA_CFLAGS += $(call cc-disable-warning,unused-function,)
+ifeq ($(cc-name),clang)
+EXTRA_CFLAGS += -Wno-error-enum-conversion
+EXTRA_CFLAGS += -Wno-error-pointer-bool-conversion
+EXTRA_CFLAGS += -Wno-error-typedef-redefinition
+EXTRA_CFLAGS += -Wno-parentheses-equality
+endif
 
 # If the module name is not "wlan", then the define MULTI_IF_NAME to be the
 # same a the QCA CHIP name. The host driver will then append MULTI_IF_NAME to
