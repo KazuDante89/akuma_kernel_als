@@ -1391,7 +1391,7 @@
 		qcom,boost-fsm-en;
 		qcom,safe-fsm-en;
 		qcom,ps-fsm-en;
-		qcom,droop-fsm-en;<  1612800000 0x04040054 0x09430043 0x2 7 >;
+		qcom,droop-fsm-en;
 		qcom,wfx-fsm-en;
 		qcom,pc-fsm-en;
 
