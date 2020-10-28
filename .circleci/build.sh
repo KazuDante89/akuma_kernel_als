@@ -1,19 +1,18 @@
 #!/usr/bin/env bash
-echo "Cloning dependencies"
 git clone --depth=1 https://github.com/KazuDante89/akuma_kernel_als -b akuma-wip kernel
 cd kernel
-git clone --depth=1 https://github.com/kdrag0n/proton-clang clang
-git clone --depth=1 https://github.com/KazuDante89/AnyKernel3-EAS AnyKernel
-echo "Done"
+git clone https://github.com/arter97/arm64-gcc --depth=1
+git clone https://github.com/arter97/arm32-gcc --depth=1
+git clone --depth=1 https://github.com/Nuub32User/AnyKernel3 AnyKernel
 IMAGE=$(pwd)/out/arch/arm64/boot/Image.gz-dtb
 TANGGAL=$(date +"%F-%S")
 START=$(date +"%s")
-export CONFIG_PATH=$PWD/arch/arm64/configs/lavender-perf_defconfig
-PATH="${PWD}/clang/bin:$PATH"
-export LD="clang/bin/ld.lld"
+export CONFIG_PATH=$PWD/arch/arm64/configs/lavender-perf-defconfig
+PATH="$(pwd)/arm64-gcc/bin:$(pwd)/arm32-gcc/bin:${PATH}" \
 export ARCH=arm64
+export USE_CCACHE=1
 export KBUILD_BUILD_HOST=circleci
-export KBUILD_BUILD_USER="kazudante"
+export KBUILD_BUILD_USER="KazuDante89"
 # sticker plox
 function sticker() {
     curl -s -X POST "https://api.telegram.org/bot$token/sendSticker" \
@@ -47,15 +46,14 @@ function finerr() {
         -d text="Build throw an error(s)"
     exit 1
 }
-# Compile plox
+# Compile the Defconfig (lavender-perf_defconfig in my case)
 function compile() {
    make O=out ARCH=arm64 lavender-perf_defconfig
-   make -j$(nproc --all) O=out \
-                         ARCH=arm64 \
-                         CC=clang \
-                         LD=ld.lld \
-		                     CROSS_COMPILE=aarch64-linux-gnu- \
-			                   CROSS_COMPILE_ARM32=arm-linux-gnueabi-
+     PATH="$(pwd)/arm64-gcc/bin:$(pwd)/arm32-gcc/bin:${PATH}" \
+       make -j$(nproc --all) O=out \
+                             ARCH=arm64 \
+                             CROSS_COMPILE=aarch64-elf- \
+                             CROSS_COMPILE_ARM32=arm-eabi-
    cp out/arch/arm64/boot/Image.gz-dtb AnyKernel
 }
 # Zipping
